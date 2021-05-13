@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "build",
+			"command": "cl.exe",
+			"args": [
+				"/Zi",
+				"/EHsc",
+				"/nologo",
+				"/Fo${workspaceFolder}\\interm\\",
+				"/I",
+				"C:\\Users\\Sheiles\\Files\\Programming\\Projects\\cConsoleLib",
+				"/Fe:",
+				"${workspaceFolder}\\Builds\\main.exe",
+				"${workspaceFolder}\\*.c",
+				"User32.lib"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: cl.exe"
+		}
+	]
+}
