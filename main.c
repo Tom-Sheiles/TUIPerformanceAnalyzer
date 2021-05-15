@@ -3,77 +3,7 @@
 #include <TlHelp32.h>
 
 #include "include.h"
-
-typedef struct Process
-{
-    char processName[255];
-    DWORD processID;
-
-} Process;
-
-//
-// Could be made more complex later. currently all processes are treated equally. 
-// Windows process can be identified with the IsProcessCritical function and values
-// sorted based on this
-//
-char **GetProcesseslist(Console *console, int *numberOfProcesses, Process **out_porcesess)
-{
-    PROCESSENTRY32 procEntry;
-    procEntry.dwSize = sizeof(PROCESSENTRY32);
-
-    HANDLE hProcSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
-    while(Process32Next(hProcSnap, &procEntry))
-    {
-        (*numberOfProcesses)++;
-    }
-    (*numberOfProcesses) -= 1;
-    Process32First(hProcSnap, &procEntry);
-
-    //
-    // MEMORY LEAKS FIX THIS
-    //
-    Process *processes = (Process *)malloc(sizeof(Process) * (*numberOfProcesses));
-    char **menuNames = malloc(sizeof(char *) * (*numberOfProcesses));
-
-    int i = 0;
-    while(Process32Next(hProcSnap, &procEntry))
-    {
-        strcpy(processes[i].processName, procEntry.szExeFile);
-        processes[i].processID = procEntry.th32ProcessID;
-
-        menuNames[i] = malloc(255 * sizeof(char));
-        strcpy(menuNames[i], procEntry.szExeFile);
-        i++;
-    }
-
-    *out_porcesess = processes;
-
-    return menuNames;
-}
-
-
-void CleanupProcessMemory(char **menuItems, Process *processes, int numberOfItems)
-{
-    for(int i = 0; i < numberOfItems; i++)
-    {
-        free(menuItems[i]);
-    }
-    free(menuItems);
-    free(processes);
-}
-
-
-//
-// Passed as pointer to qsort() to sort alphabetically
-//
-int alphaSort(const void *a, const void *b)
-{
-    const char **ia = (const char **)a;
-    const char **ib = (const char **)b;
-    return strcmp(*ia, *ib);
-}
-
+#include "ProcessWindow.h"
 
 
 int main()
@@ -88,7 +18,7 @@ int main()
 
         int numberOfProcesses = 0;
         Process *processes = NULL;
-        char **menuItems = GetProcesseslist(&console, &numberOfProcesses, &processes);
+        char **menuItems = GetProcesseslist(&numberOfProcesses, &processes);
 
         qsort(menuItems, numberOfProcesses, sizeof(char *), alphaSort);
 
