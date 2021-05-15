@@ -3,6 +3,7 @@
         "cconsole.h": "c",
         "stdlib.h": "c",
         "windows.h": "c",
-        "winuser.h": "c"
+        "winuser.h": "c",
+        "*.rh": "c"
     }
 }
