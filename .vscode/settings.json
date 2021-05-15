@@ -4,6 +4,7 @@
         "stdlib.h": "c",
         "windows.h": "c",
         "winuser.h": "c",
-        "*.rh": "c"
+        "*.rh": "c",
+        "stdio.h": "c"
     }
 }

@@ -11,13 +11,12 @@ typedef struct Process
 
 } Process;
 
-
 //
 // Could be made more complex later. currently all processes are treated equally. 
 // Windows process can be identified with the IsProcessCritical function and values
 // sorted based on this
 //
-char **listProcesses(Console *console, int *numberOfProcesses)
+char **GetProcesseslist(Console *console, int *numberOfProcesses, Process **out_porcesess)
 {
     PROCESSENTRY32 procEntry;
     procEntry.dwSize = sizeof(PROCESSENTRY32);
@@ -48,7 +47,20 @@ char **listProcesses(Console *console, int *numberOfProcesses)
         i++;
     }
 
+    *out_porcesess = processes;
+
     return menuNames;
+}
+
+
+void CleanupProcessMemory(char **menuItems, Process *processes, int numberOfItems)
+{
+    for(int i = 0; i < numberOfItems; i++)
+    {
+        free(menuItems[i]);
+    }
+    free(menuItems);
+    free(processes);
 }
 
 
@@ -75,14 +87,14 @@ int main()
         Window processWindow = {console.bufferWidth * 0.3, 0, (console.bufferWidth - (console.bufferWidth*0.3) -console.bufferWidth*0.3), console.bufferHeight-2, BWHITE, "Processes", &console};
 
         int numberOfProcesses = 0;
-        char **menuItems = listProcesses(&console, &numberOfProcesses);
+        Process *processes = NULL;
+        char **menuItems = GetProcesseslist(&console, &numberOfProcesses, &processes);
 
         qsort(menuItems, numberOfProcesses, sizeof(char *), alphaSort);
 
         Menu processesMenu = {5, 0, BWHITE, BACKGROUND_GREEN, numberOfProcesses};
         ConsoleCreateMenu(&processesMenu, menuItems, &console, MENU_NOWRAP);
         processesMenu.selected = 14;
-
 
     // 
 
@@ -147,5 +159,6 @@ int main()
         ticks++;
     }
 
+    CleanupProcessMemory(menuItems, processes, numberOfProcesses);
     FreeConsoleMemory(&console);
 }
