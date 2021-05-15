@@ -8,8 +8,27 @@ typedef struct Process
 {
     char processName[255];
     DWORD processID;
+    //DWORD currentThreads;
 
 } Process;
+
+
+
+int getNRunningProcesses(HANDLE *hProcSnap, PROCESSENTRY32 *procEntry)
+{
+    procEntry->dwSize = sizeof(PROCESSENTRY32);
+    *hProcSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    int numberOfRunningProcesses = 0;
+    while(Process32Next(*hProcSnap, procEntry))
+    {
+        numberOfRunningProcesses++;
+    }
+    numberOfRunningProcesses--;
+    Process32First(*hProcSnap, procEntry);
+
+    return numberOfRunningProcesses;
+}
 
 
 //
@@ -17,38 +36,30 @@ typedef struct Process
 // Windows process can be identified with the IsProcessCritical function and values
 // sorted based on this
 //
-char **listProcesses(Console *console, int *numberOfProcesses)
+void listProcesses(int numberOfProcesses, HANDLE hProcSnap, PROCESSENTRY32 *procEntry, Process *processes)
 {
-    PROCESSENTRY32 procEntry;
-    procEntry.dwSize = sizeof(PROCESSENTRY32);
-
-    HANDLE hProcSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
-    while(Process32Next(hProcSnap, &procEntry))
-    {
-        (*numberOfProcesses)++;
-    }
-    (*numberOfProcesses) -= 1;
-    Process32First(hProcSnap, &procEntry);
-
-    //
-    // MEMORY LEAKS FIX THIS
-    //
-    Process *processes = (Process *)malloc(sizeof(Process) * (*numberOfProcesses));
-    char **menuNames = malloc(sizeof(char *) * (*numberOfProcesses));
-
     int i = 0;
-    while(Process32Next(hProcSnap, &procEntry))
+    while(Process32Next(hProcSnap, procEntry))
     {
-        strcpy(processes[i].processName, procEntry.szExeFile);
-        processes[i].processID = procEntry.th32ProcessID;
+        strcpy(processes[i].processName, procEntry->szExeFile);
+        processes[i].processID = procEntry->th32ProcessID;
 
-        menuNames[i] = malloc(255 * sizeof(char));
-        strcpy(menuNames[i], procEntry.szExeFile);
+        //strcpy(menuNames[i], procEntry->szExeFile);
         i++;
     }
 
-    return menuNames;
+    return;
+}
+
+
+void freeProcessLists(char **menuItems, int numberOfProcesses)
+{
+    for(int i = 0; i < numberOfProcesses; i++)
+    {
+        free(menuItems[i]);
+    }
+    free(menuItems);
+    //free(processes);
 }
 
 
@@ -62,8 +73,7 @@ int alphaSort(const void *a, const void *b)
     return strcmp(*ia, *ib);
 }
 
-
-
+//new
 int main()
 {
     Console console;
@@ -74,9 +84,24 @@ int main()
     // PROCESSES LIST
         Window processWindow = {console.bufferWidth * 0.3, 0, (console.bufferWidth - (console.bufferWidth*0.3) -console.bufferWidth*0.3), console.bufferHeight-2, BWHITE, "Processes", &console};
 
-        int numberOfProcesses = 0;
-        char **menuItems = listProcesses(&console, &numberOfProcesses);
+        HANDLE hProcSnap = NULL;
+        PROCESSENTRY32 procEntry;
 
+        int numberOfProcesses = getNRunningProcesses(&hProcSnap, &procEntry);
+        
+        Process *processes = calloc(numberOfProcesses, sizeof (Process *));
+        char **menuItems = malloc(sizeof(char *) * numberOfProcesses);
+
+
+        for(int i = 0; i < numberOfProcesses; i++){
+            menuItems[i] = malloc(PROCESS_NAME_LENGTH * sizeof(char *));
+            strcpy(menuItems[i], "hello world");
+        }
+
+        listProcesses(numberOfProcesses, hProcSnap, &procEntry, processes);
+        
+
+        // Processes are listed by PID by default
         qsort(menuItems, numberOfProcesses, sizeof(char *), alphaSort);
 
         Menu processesMenu = {5, 0, BWHITE, BACKGROUND_GREEN, numberOfProcesses};
@@ -147,5 +172,6 @@ int main()
         ticks++;
     }
 
+    //freeProcessLists(menuItems, numberOfProcesses);
     FreeConsoleMemory(&console);
 }
