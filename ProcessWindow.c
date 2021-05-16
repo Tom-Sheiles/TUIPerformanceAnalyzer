@@ -1,6 +1,6 @@
 #include "ProcessWindow.h"
-
 #include "include.h"
+
 
 void CleanupProcessMemory(char **menuItems, Process *processes, int numberOfItems)
 {
@@ -50,7 +50,7 @@ char **GetProcesseslist(int *numberOfProcesses, Process **out_porcesess)
 }
 
 
-void RunProcessList(Console *console)
+Process RunProcessList(Console *console)
 {
     Window processWindow = {console->bufferWidth * 0.3, 0, (console->bufferWidth - (console->bufferWidth*0.3) -console->bufferWidth*0.3), console->bufferHeight-2, BWHITE, "Processes", console};
 
@@ -59,6 +59,7 @@ void RunProcessList(Console *console)
     char **menuItems = GetProcesseslist(&numberOfProcesses, &processes);
 
     qsort(menuItems, numberOfProcesses, sizeof(char *), alphaSort);
+    qsort(processes, numberOfProcesses, sizeof(Process), processSort);
 
     Menu processesMenu = {5, 0, BWHITE, BACKGROUND_GREEN, numberOfProcesses};
     ConsoleCreateMenu(&processesMenu, menuItems, console, MENU_NOWRAP);
@@ -76,6 +77,9 @@ void RunProcessList(Console *console)
         {
             console->running = FALSE;
             windowShowing = 0;
+            CleanupProcessMemory(menuItems, processes, numberOfProcesses);
+            FreeConsoleMemory(console);
+            exit(1);
         }
 
         if(console->keys['D'] && processesMenu.selected <= numberOfProcesses-2)
@@ -83,7 +87,10 @@ void RunProcessList(Console *console)
         if(console->keys['E'] && processesMenu.selected > 0)
             {processesMenu.selected --; processesMenu.y++;}
 
-        if(console->keys['A']) windowShowing = 0;
+        if(console->keys['A'])
+        {
+            windowShowing = 0;
+        }
 
         if(ticks % 50 == 0){
             if(GetAsyncKeyState('S') && processesMenu.selected <= numberOfProcesses-2)
@@ -109,8 +116,9 @@ void RunProcessList(Console *console)
         ticks++;
     }
 
+    Process selectedProc = processes[processesMenu.selected];
     CleanupProcessMemory(menuItems, processes, numberOfProcesses);
-    return;
+    return selectedProc;
         
 }
 
