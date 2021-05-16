@@ -1,12 +1,10 @@
 #ifndef _INCLUDES_H
 #define _INCLUDES_H
 
-
 enum Windows{
     PROCESSES_LIST,
     MEMORY_VIEWER
 };
-
 
 //
 // Passed as pointer to qsort() to sort alphabetically

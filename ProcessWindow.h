@@ -16,6 +16,6 @@ typedef struct Process
 
 void CleanupProcessMemory(char **menuItems, Process *processes, int numberOfItems);
 char **GetProcesseslist(int *numberOfProcesses, Process **out_porcesess);
-
+void RunProcessList();
 
 #endif /*_PROCESS_WINDOW_H */
