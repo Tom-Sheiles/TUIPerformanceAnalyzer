@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\Builds\\main.exe",
-            "args": ["C:\\Users\\Sheiles\\AppData\\Roaming\\Spotify\\Spotify.exe"],
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

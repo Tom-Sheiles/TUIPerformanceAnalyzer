@@ -27,9 +27,7 @@ char **GetProcesseslist(int *numberOfProcesses, Process **out_porcesess)
     (*numberOfProcesses) -= 1;
     Process32First(hProcSnap, &procEntry);
 
-    //
-    // MEMORY LEAKS FIX THIS
-    //
+
     Process *processes = (Process *)malloc(sizeof(Process) * (*numberOfProcesses));
     char **menuNames = malloc(sizeof(char *) * (*numberOfProcesses));
 

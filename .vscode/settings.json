@@ -6,6 +6,7 @@
         "winuser.h": "c",
         "*.rh": "c",
         "stdio.h": "c",
-        "include.h": "c"
+        "include.h": "c",
+        "includes.h": "c"
     }
 }
