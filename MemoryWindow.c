@@ -42,11 +42,15 @@ int UpdateMemoryInfo(MemoryInfo *memory, HANDLE hProc, PROCESS_MEMORY_COUNTERS *
 
 void RunMemoryWindow(Console *console, Process *process)
 {
-    int width = console->bufferWidth * 0.6;
-    int height = console->bufferHeight*0.70;
+    int width = console->bufferWidth-10;
+    int height = console->bufferHeight*0.30;
 
     Window memoryWindow = {1, 0, width, height, BWHITE, process->processName, console};
-    Window memoryWindow2 = {console->bufferWidth*0.6+12, 0, (console->bufferWidth-(console->bufferWidth*0.6+5))-11, console->bufferHeight-1, BWHITE, "Two", console};
+    Window CPUWindow = {1+width*0.25, height+1, width-(width*0.25), height, BWHITE, "CPU Usage", console};
+    Window win3 = {1, height+1, width - (width*0.75)-2, height*0.75/2, BWHITE, "Page Faults", console};
+    Window win4 = {1, ((height+1)+height*0.75/2)+1, width - (width*0.75)-2, height*0.75/2, BWHITE, "Temperatures", console};
+
+    //Window memoryWindow2 = {console->bufferWidth*0.6+12, 0, (console->bufferWidth-(console->bufferWidth*0.6+5))-11, console->bufferHeight-1, BWHITE, "Two", console};
 
     // Read Process memory
     HANDLE hProcess;
@@ -75,11 +79,15 @@ void RunMemoryWindow(Console *console, Process *process)
 
             if(status == 0){
                 DrawWindow(memoryWindow);
-                DrawWindow(memoryWindow2);
+                DrawWindow(CPUWindow);
+                DrawWindow(win3);
+                DrawWindow(win4);
 
-                DrawString(console, processMemory.maxMbStr, (memoryWindow.x + memoryWindow.w)+1, 1, LGREEN);
-                DrawString(console, processMemory.currentMbStr, (memoryWindow.x + memoryWindow.w)+1, memoryWindow.h/2, LGREEN);
-                DrawString(console, processMemory.minMbStr, (memoryWindow.x + memoryWindow.w)+1, memoryWindow.h-1, LGREEN);
+                DrawString(console, process->processName, 2, 0, YELLOW);
+
+                DrawString(console, processMemory.maxMbStr, (memoryWindow.x + memoryWindow.w)+1, 1, YELLOW);
+                DrawString(console, processMemory.currentMbStr, (memoryWindow.x + memoryWindow.w)+1, memoryWindow.h/2, YELLOW);
+                DrawString(console, processMemory.minMbStr, (memoryWindow.x + memoryWindow.w)+1, memoryWindow.h-1, YELLOW);
 
                 WindowFillRect(&memoryWindow, FULL_PIXEL, index, memoryWindow.h -(memoryWindow.h* (processMemory.MbPercent)), 2, memoryWindow.h, LGREEN);
             }
