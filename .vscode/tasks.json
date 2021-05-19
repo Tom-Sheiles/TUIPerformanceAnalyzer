@@ -13,7 +13,7 @@
 				"/I",
 				"C:\\Users\\Sheiles\\Files\\Programming\\Projects\\cConsoleLib",
 				"/Fe:",
-				"${workspaceFolder}\\Builds\\main.exe",
+				"${workspaceFolder}\\Builds\\PerfAn.exe",
 				"${workspaceFolder}\\*.c",
 				"User32.lib"
 			],
